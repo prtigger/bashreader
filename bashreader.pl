@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 use strict;
 use LWP::UserAgent;
-use Data::Dumper;
+use Date::Parse;
+
 
 #Для начала получим содержимое страницы. Для простоты разбора заберем rss версию
 my $url="http://bash.im/rss";
@@ -26,6 +27,7 @@ my $cntStr=0;
 #Сформируем JSON блок
 
 print "[\n";
+my $qDate="";
 
 for (@strings)
 {
@@ -38,10 +40,20 @@ for (@strings)
             $inQuote=0;
             $count++;
         }
+        
+        #Найдем дату и отформатируем ее в другой вид
+        if (m!(<pubDate>)(.*)(</pubDate)!) {
+            my ($ss,$mm,$hh,$day,$month,$year,$zone)=strptime($2);
+            $year += 1900;
+            $qDate=sprintf "%d.%02d.%d %02d:%02d:%02d",$day,$month,$year,$hh,$mm,$ss;
+        }
+        
+        
         if (/<(!\[CDATA\[)(.*)(\]\])/) {
             print $count ? "},\n{" : "{";
-            
-            print "\"quote\":\"$2\"";
+        
+        #Распечатаем JSON строку    
+            print "\"Date\":\"$qDate\",\n\"quote\":\"$2\"";
         }
         
     }
