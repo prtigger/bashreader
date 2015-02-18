@@ -23,6 +23,10 @@ my $inQuote = 0;
 my $count=0;
 my $cntStr=0;
 
+#—формируем JSON блок
+
+print "[\n";
+
 for (@strings)
 {
     $cntStr++;
@@ -34,11 +38,15 @@ for (@strings)
             $inQuote=0;
             $count++;
         }
+        if (/<(!\[CDATA\[)(.*)(\]\])/) {
+            print $count ? "},\n{" : "{";
+            
+            print "\"quote\":\"$2\"";
+        }
+        
     }
     
 }
 
-print "We have $cntStr strings\n";
-print "In text we found $count citates";
-
+print $count ? "}\n]\n" : "]\n";
 
